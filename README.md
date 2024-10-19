@@ -16,6 +16,24 @@ This project implements an Echo State Network (ESN) for wind speed prediction us
 - `testReservoir.m`: Function for testing individual reservoirs
 - `test_transfor.m`: Implementation of the ESN and error compensation
 
+## Key Parameters
+
+The following parameters in `ETL_ESN.m` can be adjusted to customize the experiment:
+
+- `config.parallel`: Set to 1 to use parallel processing, 0 otherwise
+- `config.res_type`: Type of reservoir ('RoR' in this case)
+- `config.num_nodes`: Number of nodes in the reservoir (default: 200)
+- `config.num_tests`: Number of tests/runs to perform
+- `config.pop_size`: Initial population size for evolutionary optimization
+- `config.error_to_check`: Error metric to use ('test' in this case)
+- `config.dataset`: Dataset to use ('wind' in this case)
+- `config.input_scaling`: Input scaling factor (adjusted in each test)
+- `config.k_neighbours`: Number of neighbours to check for novelty search
+- `config.p_min_start`: Initial novelty threshold
+- `config.p_min_check`: Generation count to dynamically change novelty threshold
+
+Adjust these parameters based on your specific requirements and computational resources.
+
 ## Recent Updates
 
 - Added functionality to output the minimum test error across the population
