@@ -51,31 +51,55 @@ options = trainingOptions('adam', ...
     'LearnRateDropPeriod', 125, ...
     'LearnRateDropFactor', 0.95, ...
     'Verbose', 0, ...
-    'Plots', 'training-progress');
+    'Plots', 'none');
 
-%% Train the model
-net = trainNetwork(xTrain, yTrain, layers, options);
+%% Run multiple times and calculate average metrics
+num_runs = 20;
+mae_runs = zeros(1, num_runs);
+rmse_runs = zeros(1, num_runs);
+time_runs = zeros(1, num_runs);
 
-%% Make predictions on training set
-net = predictAndUpdateState(net, xTrain);
-yPredTrain = predict(net, xTrain, 'ExecutionEnvironment', 'cpu');
+for run = 1:num_runs
+    tic; % Start timing
+    
+    %% Train the model
+    net = trainNetwork(xTrain, yTrain, layers, options);
 
-% Calculate training error
-mseTrain = mean((yPredTrain - yTrain).^2);
+    %% Make predictions on test set
+    net = resetState(net);
+    numTimeStepsTest = size(xTest, 2);
+    yPredTest = zeros(numTimeStepsTest, 1);
 
-%% Make predictions on test set
-net = resetState(net);
-numTimeStepsTest = size(xTest, 2);
-yPredTest = zeros(numTimeStepsTest, 1);
+    for i = 1:numTimeStepsTest
+        [net, yPredTest(i)] = predictAndUpdateState(net, xTest(:, i), 'ExecutionEnvironment', 'cpu');
+    end
 
-for i = 1:numTimeStepsTest
-    [net, yPredTest(i)] = predictAndUpdateState(net, xTest(:, i), 'ExecutionEnvironment', 'cpu');
+    %% Evaluate performance
+    mae_runs(run) = mean(abs(yTest - yPredTest'));
+    rmse_runs(run) = sqrt(mean((yTest - yPredTest').^2));
+    
+    time_runs(run) = toc; % End timing
+    
+    fprintf('Run %d: MAE = %.4f, RMSE = %.4f, Time = %.4f seconds\n', run, mae_runs(run), rmse_runs(run), time_runs(run));
 end
 
-%% Evaluate performance
-mae = mean(abs(yTest - yPredTest'));
-rmse = sqrt(mean((yTest - yPredTest').^2));
+%% Calculate and display average metrics
+avg_mae = mean(mae_runs);
+avg_rmse = mean(rmse_runs);
+avg_time = mean(time_runs);
 
-% Display results
-disp(['MAE = ', num2str(mae)]);
-disp(['RMSE = ', num2str(rmse)]);
+disp('----------------------------');
+disp(['Average MAE = ', num2str(avg_mae)]);
+disp(['Average RMSE = ', num2str(avg_rmse)]);
+disp(['Average Runtime = ', num2str(avg_time), ' seconds']);
+
+%% Plot results (using the last run)
+figure;
+plot(yTest, 'b', 'LineWidth', 2);
+hold on;
+plot(yPredTest, 'r', 'LineWidth', 2);
+legend('Actual', 'Predicted');
+title('LSTM Network Performance');
+xlabel('Time Step');
+ylabel('Normalized Wind Speed');
+grid on;

@@ -7,9 +7,9 @@ rng(1,'twister');% rng(seed,generator)
 config.parallel = 0;                        % use parallel toolbox  
 
 % start paralllel pool if empty
-if isempty(gcp) && config.parallel
-    parpool('local',4,'IdleTimeout', Inf);  % create parallel pool
-end
+% if isempty(gcp) && config.parallel
+%     parpool('local',4,'IdleTimeout', Inf);  % create parallel pool
+% end
 
 % type of network to evolve
 config.res_type  = 'RoR';           
@@ -18,7 +18,7 @@ config = selectReservoirType(config);
 config.ngrc = 0;
 %% Evolutionary parameters
 config.num_tests    = 1;                     % num of tests/runs
-config.pop_size     = 100;                    % initail population size.
+config.pop_size     = 10;                  % initail population size.
 config.error_to_check = 'test';              % train&val&test'
 %% Task parameters
 config.discrete = 0;             % select '1' for binary input for discrete systems
@@ -52,14 +52,15 @@ config.multi_offspring = 1;                  % multiple tournament selection and
 config.num_sync_offspring = 4;               % length of cycle/synchronisation step
 
 %% Run experiments
+total_time = 0;
 for tests = 1:config.num_tests
     config.input_scaling = 0.5 * tests;   
-    clearvars -except config tests figure1 figure2 quality database_history pred_dataset
+    clearvars -except config tests figure1 figure2 quality database_history pred_dataset total_time
     
     warning('off','all')
     fprintf('\n Test: %d  ',tests);
     fprintf('Processing genotype......... %s \n',datestr(now, 'HH:MM:SS'))
-    tic
+    test_start_time = tic;
     
     % update random seed
     % rng(tests,'twister');
@@ -78,21 +79,45 @@ for tests = 1:config.num_tests
         for pop_indx = 1:config.pop_size
             tic
             population(pop_indx) = config.testFcn(population(pop_indx),config);
-            toc
-            et(pop_indx) = toc;
-            fprintf('\n i = %d, took: %.4f\n',pop_indx,toc);
+            iteration_time = toc;
+            et(pop_indx) = iteration_time;
+            fprintf('\n i = %d, took: %.4f\n',pop_indx,iteration_time);
         end
     end
     
+    test_end_time = toc(test_start_time);
+    total_time = total_time + test_end_time;
+    fprintf('\nTest %d completed in %.2f seconds\n', tests, test_end_time);
 end
 config.finish_time = datestr(now, 'HH:MM:SS');
 
 % Find the minimum test error
 min_test_error = Inf;
 for i = 1:length(population)
-    if isfield(population(i), 'test_error') && population(i).test_error < min_test_error
-        min_test_error = population(i).test_error;
+    if isfield(population(i), 'err_rmse') && population(i).err_rmse < min_test_error
+        min_test_error = population(i).err_rmse;
     end
 end
 
 fprintf('Minimum test error: %.6f\n', min_test_error);
+fprintf('Total execution time: %.2f seconds\n', total_time);
+fprintf('Average time per test: %.2f seconds\n', total_time / config.num_tests);
+
+% Calculate and display time statistics for individual iterations
+mean_iteration_time = mean(et);
+std_iteration_time = std(et);
+min_iteration_time = min(et);
+max_iteration_time = max(et);
+
+fprintf('\nIteration time statistics:\n');
+fprintf('Mean: %.4f seconds\n', mean_iteration_time);
+fprintf('Standard deviation: %.4f seconds\n', std_iteration_time);
+fprintf('Minimum: %.4f seconds\n', min_iteration_time);
+fprintf('Maximum: %.4f seconds\n', max_iteration_time);
+
+% Plot histogram of iteration times
+figure;
+histogram(et);
+title('Histogram of Iteration Times');
+xlabel('Time (seconds)');
+ylabel('Frequency');
