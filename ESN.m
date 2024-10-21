@@ -30,7 +30,7 @@ resSize = 200;     % Number of reservoir nodes
 
 
 %% Run multiple times and calculate average metrics
-num_runs = 20;
+num_runs = 100;
 mae_runs = zeros(1, num_runs);
 rmse_runs = zeros(1, num_runs);
 time_runs = zeros(1, num_runs);
@@ -41,8 +41,8 @@ for run = 1:num_runs
     %% Generate the ESN reservoir (reinitialize for each run)
     % Initialize weights
     Win = (rand(resSize, 1+inSize) - 0.5) * 1;  % Input weights
-    W = rand(resSize, resSize) - 0.5;           % Reservoir weights
-    leakingRate = rand(1);% Leaking rate
+    W   = rand(resSize, resSize) - 0.5;           % Reservoir weights
+    leakingRate = 0.8;% Leaking rate
     % Normalize and set spectral radius
     opt.disp = 0;
     rhoW = abs(eigs(W, 1, 'LM', opt));
@@ -63,8 +63,8 @@ for run = 1:num_runs
     end
 
     %% Train the output weights
-    reg = 1e-3;  % Regularization coefficient
-    Wout = ((X*X' + reg*eye(1+inSize+resSize)) \ (X*Yt'))';
+    reg = 1e-6;  % Regularization coefficient
+    Wout = ((X*X' + reg*eye(1+inSize+resSize)) \ (X*Yt))';
 
     %% Test the trained ESN
     Y = zeros(outSize, testLen);
@@ -80,8 +80,8 @@ for run = 1:num_runs
     output = Y * data_std + data_mean;
     ytest = data(trainLen+2:trainLen+testLen+1)' * data_std + data_mean;
 
-    mae_runs(run) = mean(abs(ytest - output));
-    rmse_runs(run) = sqrt(mean((ytest - output).^2));
+    mae_runs(run) = mean(abs(ytest - output'));
+    rmse_runs(run) = sqrt(mean((ytest - output').^2));
     
     time_runs(run) = toc; % End timing
     

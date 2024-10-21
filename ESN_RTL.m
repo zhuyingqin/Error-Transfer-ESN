@@ -7,10 +7,10 @@ testLen = 300;     % Test data length
 initLen = 30;      % Initial run length
 
 % Load and preprocess data for wind turbine 1
-[data1, data_mean1, data_std1] = loadAndPreprocessData('dataset/wtbdata_cleaned73.csv');
+[data1, data_mean1, data_std1] = loadAndPreprocessData('dataset/wtbdata_cleaned123.csv');
 
 % Load and preprocess data for wind turbine 2
-[data2, data_mean2, data_std2] = loadAndPreprocessData('dataset/wtbdata_cleaned2.csv');
+[data2, data_mean2, data_std2] = loadAndPreprocessData('dataset/wtbdata_cleaned1.csv');
 
 % Select a subset of data for both turbines
 data = data1(1:6000);
@@ -37,7 +37,7 @@ disp('done.');
 state = zeros(reservoirSize, 1);
 state_new = zeros(reservoirSize, 1);
 P = eye(reservoirSize + inputSize + 1) / 1;
-forgettingFactor = 0.99;
+forgettingFactor = 0.97;
 outputWeights = zeros(1 + inputSize + reservoirSize, 1);
 outputs = zeros(trainLen, 1);
 outputs_new = zeros(trainLen, 1);
@@ -105,6 +105,6 @@ end
 function [mae, rmse] = evaluatePerformance(actual, predicted, dataMean, dataStd)
     output = predicted * dataStd + dataMean;
     ytest = actual * dataStd + dataMean;
-    mae = mean(abs(ytest - output));
-    rmse = sqrt(mean((ytest - output).^2));
+    mae = mean(abs(ytest - output'));
+    rmse = sqrt(mean((ytest - output').^2));
 end

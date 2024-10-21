@@ -15,7 +15,7 @@ for i = 1:length(config.num_nodes)            % apply to all reservoirs, 0 to 1 
 end
 config.internal_sparsity = 0.2;
 config.input_weight_initialisation = 'norm';     % e.g.,  'norm', 'uniform', 'orth', etc. must be same length as number of subreservoirs
-config.connecting_sparsity =0.1;
+config.connecting_sparsity = 0.1;
 config.internal_weight_initialisation = 'norm';  % e.g.,  'norm', 'uniform', 'orth', etc.  must be same length as number of subreservoirs
 
 config.evolve_output_weights = 0;               % evolve rather than train
@@ -46,7 +46,7 @@ config.run_sim = 0;
 config.film = 0;                            %record simulation
 
 % iir filter params (not currently in use)
-config.iir_filter_on = 1;                       % add iir filters to states ** not in use yet
+config.iir_filter_on = 0;                       % add iir filters to states ** not in use yet
 config.iir_filter_order = 2; 
 
 %% Change/add parameters depending on reservoir type
@@ -181,70 +181,3 @@ switch(res_type)
     otherwise
         
 end
-
-%% Task parameters - now apply task-specific parameters
-% If a task requires additional parameters, or resetting from defaults, add
-% here.
-switch(config.dataset)
-    
-    case 'autoencoder'
-        config.leak_on = 0;                          % add leak states
-        config.add_input_states = 0;
-        config.figure_array = [config.figure_array figure];
-        config.sparse_input_weights = 0;
-        
-    case 'pole_balance'
-        config.time_steps = 1000;
-        config.simple_task = 2;
-        config.pole_tests = 2;
-        config.velocity = 1;
-        config.run_sim = 0;
-        config.testFcn = @poleBalance;
-        config.evolve_output_weights = 1;
-        config.add_input_states = 0;                  %add input to states
-        
-    case 'robot'
-        % type of task
-        config.robot_behaviour = 'explore_maze';    %select behaviour/file to simulate
-        config.time_steps = 500;                    % sim time
-        %sensors
-        config.sensor_range = 0.5;                 % range of lidar
-        config.evolve_sensor_range = 0;             % use leakRate parameter as proxy for sensor range (evolvable)
-        config.sensor_radius = 2*pi;
-        % sim parameters
-        config.run_sim = 0;                          % whether to run/watch sim
-        config.robot_tests = 1;                     % how many tests to conduct: to provide avg fitness
-        config.show_robot_tests = config.robot_tests; % how many tests to watch/check visually
-        config.sim_speed = 25;                       % speed of sim result/visualisation. e.g. if =2, 2x speed
-        config.testFcn = @robot;                    % assess fcn for robot tasks
-        config.evolve_output_weights = 1;             % must be on; unsupervised/reinforcement problem
-        
-        %environment
-        config.bounds_x = 5;                        % scaler for extending bounds of environment
-        config.bounds_y = 5;
-        config.num_obstacles = 0;                   % number of obstacles to place in environment
-        config.num_target_points = 1000;            % grid of target points used for fitness calculation
-        config.maze_size = 5;                       % if maze, the size and complexity of maze
-        % Go to selectDataset.m to change num_sensors
-        
-    case 'attractor'
-        config.leak_on = 0;                          % add leak states
-        config.add_input_states = 0;
-        config.figure_array = [config.figure_array figure];
-        config.sparse_input_weights = 0;
-        
-        config.attractor_type = 'mackey_glass';
-        config.evolve_output_weights = 1;
-        config.evolve_feedback_weights = 1;
-        % config.assessFcn = @collectRoRStatesFeedback;
-        config.assessFcn = @collectRoRStates;
-        config.preprocess = 0;
-        
-    case {'MSO1','MSO2','MSO3','MSO4','MSO5','MSO6','MSO7','MSO8','MSO9','MSO10','MSO11','MSO12'}  %MSO'
-        
-        config.preprocess = 0;
-    otherwise
-        
-end
-
-

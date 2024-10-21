@@ -20,8 +20,10 @@ for pop_indx = 1:config.pop_size
         population(pop_indx).n_input_units  = 1;
         population(pop_indx).n_output_units = 1;
     else
-        population(pop_indx).n_input_units  = size(config.train_input_sequence,2);
-        population(pop_indx).n_output_units = size(config.train_output_sequence,2);
+        % population(pop_indx).n_input_units  = size(config.train_input_sequence,2);
+        % population(pop_indx).n_output_units = size(config.train_output_sequence,2);
+        population(pop_indx).n_input_units  = 2;
+        population(pop_indx).n_output_units = 1;
     end
     
     % iterate through subreservoirs  
@@ -32,7 +34,7 @@ for pop_indx = 1:config.pop_size
 
         
         % Scaling and leak rate
-        population(pop_indx).input_scaling(i) = 0.001;   % increases nonlinearity
+        population(pop_indx).input_scaling(i) = 0.1;   % increases nonlinearity
         % population(pop_indx).input_scaling(i) = config.input_scaling; % increases nonlinearity
         population(pop_indx).leak_rate(i) = rand();
         
@@ -94,7 +96,7 @@ for pop_indx = 1:config.pop_size
         for j= 1:config.num_reservoirs
             
             % assign scaling for inner weights 
-            population(pop_indx).W_scaling(i,j) = 0.99;
+            population(pop_indx).W_scaling(i,j) = rand(1);
             
             % initialise connectivity of subrevervoir weights and connecting weights
             if i == j

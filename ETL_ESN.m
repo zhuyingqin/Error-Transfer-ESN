@@ -32,7 +32,7 @@ config.task_list = {'MSO12'}; % tasks to assess
 % get any additional params. This might include:
 % details on reservoir structure, extra task variables, etc.
 config = getAdditionalParameters(config);
-config = getAdditionalParameters1(config);
+% config = getAdditionalParameters1(config);
 
 % get dataset information 
 config = selectDataset(config);
@@ -92,28 +92,28 @@ end
 config.finish_time = datestr(now, 'HH:MM:SS');
 
 % Find the minimum test error
-min_test_error = Inf;
-for i = 1:length(population)
-    if isfield(population(i), 'err_rmse') && population(i).err_rmse < min_test_error
-        min_test_error = population(i).err_rmse;
-    end
-end
-
-fprintf('Minimum test error: %.6f\n', min_test_error);
-fprintf('Total execution time: %.2f seconds\n', total_time);
-fprintf('Average time per test: %.2f seconds\n', total_time / config.num_tests);
+% min_test_error = Inf;
+% for i = 1:length(population)
+%     if isfield(population(i), 'err_rmse') && population(i).err_rmse < min_test_error
+%         min_test_error = population(i).err_rmse;
+%     end
+% end
+% 
+% fprintf('Minimum test error: %.6f\n', min_test_error);
+% fprintf('Total execution time: %.2f seconds\n', total_time);
+% fprintf('Average time per test: %.2f seconds\n', total_time / config.num_tests);
 
 % Calculate and display time statistics for individual iterations
-mean_iteration_time = mean(et);
-std_iteration_time = std(et);
-min_iteration_time = min(et);
-max_iteration_time = max(et);
-
-fprintf('\nIteration time statistics:\n');
-fprintf('Mean: %.4f seconds\n', mean_iteration_time);
-fprintf('Standard deviation: %.4f seconds\n', std_iteration_time);
-fprintf('Minimum: %.4f seconds\n', min_iteration_time);
-fprintf('Maximum: %.4f seconds\n', max_iteration_time);
+% mean_iteration_time = mean(et);
+% std_iteration_time = std(et);
+% min_iteration_time = min(et);
+% max_iteration_time = max(et);
+% 
+% fprintf('\nIteration time statistics:\n');
+% fprintf('Mean: %.4f seconds\n', mean_iteration_time);
+% fprintf('Standard deviation: %.4f seconds\n', std_iteration_time);
+% fprintf('Minimum: %.4f seconds\n', min_iteration_time);
+% fprintf('Maximum: %.4f seconds\n', max_iteration_time);
 
 % Plot histogram of iteration times
 figure;
