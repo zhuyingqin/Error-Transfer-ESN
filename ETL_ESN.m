@@ -18,7 +18,7 @@ config = selectReservoirType(config);
 config.ngrc = 0;
 %% Evolutionary parameters
 config.num_tests    = 1;                     % num of tests/runs
-config.pop_size     = 10;                  % initail population size.
+config.pop_size     = 100;                  % initail population size.
 config.error_to_check = 'test';              % train&val&test'
 %% Task parameters
 config.discrete = 0;             % select '1' for binary input for discrete systems

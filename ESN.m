@@ -24,7 +24,7 @@ data = diff(data);
 data = seriesDecomp(data, 3);
 
 %% ESN parameters
-inSize = 1;        % Number of input nodes
+inSize = 2;        % Number of input nodes
 outSize = 1;       % Number of output nodes
 resSize = 200;     % Number of reservoir nodes
 
@@ -55,10 +55,10 @@ for run = 1:num_runs
     % Run the reservoir with the data and collect states
     x = zeros(resSize, 1);
     for t = 1:trainLen
-        u = data(t);
+        u = data(t, :)';  % Ensure u is a column vector
         x = (1-leakingRate) * x + leakingRate * tanh(Win*[1; u] + W*x);
         if t > initLen
-            X(:, t-initLen) = [1; u; x];
+            X(:, t-initLen) = vertcat(1, u, x);  % Use vertcat for vertical concatenation
         end
     end
 
@@ -68,12 +68,12 @@ for run = 1:num_runs
 
     %% Test the trained ESN
     Y = zeros(outSize, testLen);
-    u = data(trainLen+1);
+    u = data(trainLen+1, :)';  % Ensure u is a column vector
     for t = 1:testLen 
-        x = (1-leakingRate)*x + leakingRate*tanh(Win*[1; u] + W*x);
-        y = Wout * [1; u; x];
+        x = (1-leakingRate) * x + leakingRate*tanh(Win*vertcat(1, u) + W*x);
+        y = Wout * vertcat(1, u, x);
         Y(:, t) = y;
-        u = data(trainLen+t+1);  % Teacher forcing
+        u = data(trainLen+t+1, :)';  % Teacher forcing, ensure u is a column vector
     end
 
     %% Denormalize and compute error metrics
