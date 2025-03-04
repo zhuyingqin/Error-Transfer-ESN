@@ -56,6 +56,22 @@ After running the experiment, the script will output the minimum test error achi
 - Integration with other machine learning techniques
 - Expansion to other time series prediction tasks
 
+## Citation
+
+If you use this code in your research, please cite:
+
+```
+@article{zhu2025real,
+  title={Real-time Error Compensation Transfer Learning with Echo State Networks for Enhanced Wind Power Prediction},
+  author={Zhu, Yingqin and Liu, Yue and Wang, Nan and Zhang, ZhaoZhao and Li, YuanQiang},
+  journal={Applied Energy},
+  volume={379},
+  pages={124893},
+  year={2025},
+  publisher={Elsevier}
+}
+```
+
 ## Contributors
 
 [Your Name/Team Name]
